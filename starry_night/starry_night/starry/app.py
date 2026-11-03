@@ -1,12 +1,21 @@
 """Window, input handling and main loop."""
 import argparse
-import os
-import sys
 import time
 
 import pygame
 
 from .config import FPS, H, TITLE, W
+
+
+def positive_int(value):
+    """Parse a positive integer for frame-count command-line options."""
+    try:
+        frames = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be an integer") from exc
+    if frames < 1:
+        raise argparse.ArgumentTypeError("must be at least 1")
+    return frames
 
 
 def make_screen():
@@ -52,7 +61,8 @@ def handle_key(scene, key, screen):
 def run(argv=None):
     ap = argparse.ArgumentParser(description="The Starry Night — Living Painting")
     ap.add_argument("--save-frame", metavar="PNG", help="render and save a still, then exit")
-    ap.add_argument("--frames", type=int, default=240, help="frames to simulate before saving / benchmarking")
+    ap.add_argument("--frames", type=positive_int, default=240,
+                    help="positive number of frames to simulate before saving / benchmarking")
     ap.add_argument("--bench", action="store_true", help="print average frame cost, then exit")
     args = ap.parse_args(argv)
 
